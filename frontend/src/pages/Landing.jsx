@@ -48,7 +48,7 @@ const Landing = () => {
           </div>
           <h3 className="font-outfit text-xl font-bold text-white mb-2">Random Forest AI Model</h3>
           <p className="text-slate-400 text-sm font-light leading-relaxed">
-            Predict the ideal crop from 22 options using a Random Forest Classifier trained on agricultural datasets with 98% accuracy.
+            Predict the ideal crop from 50 options using a Random Forest Classifier trained on agricultural datasets with 98% accuracy.
           </p>
         </div>
 
@@ -89,7 +89,7 @@ const Landing = () => {
             <div className="text-xs text-slate-400 font-medium uppercase mt-1">Model Accuracy</div>
           </div>
           <div>
-            <div className="font-outfit text-3xl md:text-4xl font-extrabold text-white">22+</div>
+            <div className="font-outfit text-3xl md:text-4xl font-extrabold text-white">50+</div>
             <div className="text-xs text-slate-400 font-medium uppercase mt-1">Crops Supported</div>
           </div>
           <div>
