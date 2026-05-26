@@ -1,7 +1,8 @@
 import axios from 'axios';
 
+// Use VITE_API_URL env variable in production, fallback to '/api' for local proxy
 const api = axios.create({
-  baseURL: '/api',
+  baseURL: import.meta.env.VITE_API_URL || '/api',
 });
 
 // Automatically inject JWT token into requests if it exists in localStorage
