@@ -79,7 +79,7 @@ const ChatBot = () => {
     setIsLoading(true);
 
     try {
-      const res = await api.post('/api/chat', { message: messageText });
+      const res = await api.post('/chat', { message: messageText });
       const botMsg = {
         id: Date.now() + 1,
         sender: 'bot',
