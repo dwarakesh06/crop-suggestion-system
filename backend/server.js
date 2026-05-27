@@ -11,6 +11,7 @@ dotenv.config();
 const authController = require("./controllers/authController");
 const predictController = require("./controllers/predictController");
 const adminController = require("./controllers/adminController");
+const chatController = require("./controllers/chatController");
 const { protect, optionalProtect, admin } = require("./middleware/auth");
 const upload = require("./middleware/upload");
 const errorHandler = require("./middleware/error");
@@ -48,6 +49,9 @@ app.delete("/api/admin/users/:id", protect, admin, adminController.deleteUser);
 app.get("/api/admin/predictions", protect, admin, adminController.getAllPredictions);
 app.delete("/api/admin/predictions/:id", protect, admin, adminController.deletePrediction);
 app.post("/api/admin/dataset-upload", protect, admin, upload.single("dataset"), adminController.uploadDataset);
+
+// Chatbot Route
+app.post("/api/chat", chatController.chat);
 
 // Handle undefined routes
 app.use("*", (req, res) => {

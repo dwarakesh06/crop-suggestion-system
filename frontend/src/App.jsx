@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import Navbar from './components/Navbar';
+import ChatBot from './components/ChatBot';
 
 // Pages
 import Landing from './pages/Landing';
@@ -88,6 +89,9 @@ function App() {
           
           {/* Global Footer */}
           <Footer />
+
+          {/* Global ChatBot Widget */}
+          <ChatBot />
         </div>
       </AuthProvider>
     </Router>
