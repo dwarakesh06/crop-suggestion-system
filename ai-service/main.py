@@ -1,5 +1,8 @@
 import os
+import asyncio
+import logging
 import uvicorn
+from contextlib import asynccontextmanager
 from fastapi import FastAPI, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
@@ -7,10 +10,42 @@ from pydantic import BaseModel, Field
 from train import train_model
 from predict import predict_crop_and_advise
 
+logger = logging.getLogger("keepalive")
+
+# Self-ping task to prevent Render free tier from sleeping
+async def keep_alive():
+    """Pings our own /health endpoint every 10 minutes to stay awake."""
+    await asyncio.sleep(60)  # Wait 1 min after startup before first ping
+    self_url = os.environ.get("SELF_URL", "")
+    if not self_url:
+        logger.info("SELF_URL not set — keep-alive ping disabled.")
+        return
+    try:
+        import httpx
+        while True:
+            try:
+                async with httpx.AsyncClient(timeout=20) as client:
+                    resp = await client.get(f"{self_url}/health")
+                    logger.info(f"Keep-alive ping → {resp.status_code}")
+            except Exception as e:
+                logger.warning(f"Keep-alive ping failed: {e}")
+            await asyncio.sleep(600)  # Ping every 10 minutes
+    except ImportError:
+        logger.warning("httpx not installed — keep-alive ping disabled. Add httpx to requirements.txt")
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Start keep-alive background task on startup
+    task = asyncio.create_task(keep_alive())
+    yield
+    task.cancel()
+
+
 app = FastAPI(
     title="Crop Suggestion AI Service",
     description="Machine Learning Service for Crop Prediction, Fertilizer Recommendations, and Yield Estimation",
-    version="1.0.0"
+    version="1.0.0",
+    lifespan=lifespan
 )
 
 # Enable CORS
