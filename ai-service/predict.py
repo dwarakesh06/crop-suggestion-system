@@ -6,7 +6,21 @@ import numpy as np
 # Resolve BASE_DIR relative to script location (c:/Users/papan/OneDrive/Desktop/p1)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
+_cached_model = None
+_cached_scaler = None
+_cached_stats = None
+
+def clear_artifacts_cache():
+    global _cached_model, _cached_scaler, _cached_stats
+    _cached_model = None
+    _cached_scaler = None
+    _cached_stats = None
+
 def load_artifacts():
+    global _cached_model, _cached_scaler, _cached_stats
+    if _cached_model is not None and _cached_scaler is not None:
+        return _cached_model, _cached_scaler, _cached_stats
+
     model_path = os.path.join(BASE_DIR, "models", "crop_model.pkl")
     scaler_path = os.path.join(BASE_DIR, "models", "scaler.pkl")
     stats_path = os.path.join(BASE_DIR, "models", "crop_stats.json")
@@ -15,17 +29,18 @@ def load_artifacts():
         raise FileNotFoundError(f"Model artifacts not found at {model_path}. Please train the model first.")
         
     with open(model_path, "rb") as f:
-        model = pickle.load(f)
+        _cached_model = pickle.load(f)
         
     with open(scaler_path, "rb") as f:
-        scaler = pickle.load(f)
+        _cached_scaler = pickle.load(f)
         
     crop_stats = {}
     if os.path.exists(stats_path):
         with open(stats_path, "r") as f:
             crop_stats = json.load(f)
+    _cached_stats = crop_stats
             
-    return model, scaler, crop_stats
+    return _cached_model, _cached_scaler, _cached_stats
 
 def predict_crop_and_advise(inputs):
     """

@@ -7,7 +7,6 @@ from fastapi import FastAPI, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
-from train import train_model
 from predict import predict_crop_and_advise
 
 logger = logging.getLogger("keepalive")
@@ -106,8 +105,20 @@ def predict(payload: CropInput):
 @app.post("/train", status_code=status.HTTP_200_OK)
 def train(payload: TrainRequest):
     try:
+        # Dynamically import to avoid loading pandas/heavy sklearn modules during startup
+        from train import train_model
+        from predict import clear_artifacts_cache
+        import gc
+        
         # Pass the csv_path directly (train_model resolves it internally relative to BASE_DIR)
         metrics = train_model(payload.csv_path)
+        
+        # Clear the prediction artifact cache so that the next prediction loads the new model
+        clear_artifacts_cache()
+        
+        # Force garbage collection to free memory consumed during training
+        gc.collect()
+        
         return {
             "message": "Model trained and saved successfully.",
             "metrics": metrics
